@@ -65,6 +65,7 @@ class _QuizState extends State<Quiz> {
       if(answer == mainKana[currentQuestion]){
         score.add(1);
         compute();
+        pastQuestions.add(currentQuestion);
       }
     });
 
@@ -91,7 +92,7 @@ class _QuizState extends State<Quiz> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(currentQuestion, style: TextStyle(fontSize: 300, fontWeight: FontWeight.bold)),
+            Text(currentQuestion, style: TextStyle(fontSize: 150, fontWeight: FontWeight.bold)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly ,
               children: [
