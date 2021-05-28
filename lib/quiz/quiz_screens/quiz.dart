@@ -47,9 +47,10 @@ class _QuizState extends State<Quiz> {
           choices.add(mainKana[character]);
       }
       choices.shuffle();
-
     });
   }
+
+
 
   void compute(){
     this.totalPoints = 0;
@@ -72,6 +73,7 @@ class _QuizState extends State<Quiz> {
 
   @override
   Widget build(BuildContext context) {
+    final ButtonStyle style = ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 25));
     final arguments = ModalRoute.of(context).settings.arguments as Map;
       if (arguments['ws'] == "hiragana"){
         this.mainKana = Hiragana().getQuestions(arguments['type']);
@@ -79,8 +81,8 @@ class _QuizState extends State<Quiz> {
         this.mainKana = Katakana().getQuestions(arguments['type']);
       }
     generateQuestion();
-
     return Scaffold(
+
       appBar: AppBar(
         title: Text(arguments['type'] + " (" + arguments['ws'] + ")"),
       ),
@@ -95,18 +97,21 @@ class _QuizState extends State<Quiz> {
               children: [
                 ElevatedButton(
                   child: Text(choices[0]),
+                  style: style,
                   onPressed: (){
                     checkAnswer(choices[0]);
                   },
                 ),
                 ElevatedButton(
                   child: Text(choices[1]),
+                  style: style,
                   onPressed: (){
                     checkAnswer(choices[1]);
                   },
                 ),
                 ElevatedButton(
                   child: Text(choices[2]),
+                  style: style,
                   onPressed: (){
                     checkAnswer(choices[2]);
                   },
