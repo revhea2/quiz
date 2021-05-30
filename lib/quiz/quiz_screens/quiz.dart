@@ -12,7 +12,7 @@ class Quiz extends StatefulWidget {
 }
 
 class _QuizState extends State<Quiz> {
-  Map mainKana;
+  Map questions;
   List<String> pastQuestions;
   String currentQuestion;
   List<String> choices;
@@ -32,19 +32,19 @@ class _QuizState extends State<Quiz> {
   void generateQuestion(){
     setState(() {
       //selects a random character
-      currentQuestion = mainKana.keys.elementAt(randomizer.nextInt(mainKana.length));
+      currentQuestion = questions.keys.elementAt(randomizer.nextInt(questions.length));
       while(pastQuestions.contains(currentQuestion)){
-        currentQuestion = mainKana.keys.elementAt(randomizer.nextInt(mainKana.length));
+        currentQuestion = questions.keys.elementAt(randomizer.nextInt(questions.length));
       }
 
       //selects random answers
-      choices = [mainKana[currentQuestion]];
+      choices = [questions[currentQuestion]];
       while(choices.length < 3){
-          String character = mainKana.keys.elementAt(randomizer.nextInt(mainKana.length));
-          if(choices.contains(mainKana[character])){
+          String character = questions.keys.elementAt(randomizer.nextInt(questions.length));
+          if(choices.contains(questions[character])){
             continue;
           }
-          choices.add(mainKana[character]);
+          choices.add(questions[character]);
       }
       choices.shuffle();
     });
@@ -62,13 +62,12 @@ class _QuizState extends State<Quiz> {
 
   void checkAnswer(String answer){
     setState(() {
-      if(answer == mainKana[currentQuestion]){
+      if(answer == questions[currentQuestion]){
         score.add(1);
         compute();
         pastQuestions.add(currentQuestion);
       }
     });
-
   }
 
 
@@ -77,9 +76,9 @@ class _QuizState extends State<Quiz> {
     final ButtonStyle style = ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 25));
     final arguments = ModalRoute.of(context).settings.arguments as Map;
       if (arguments['ws'] == "hiragana"){
-        this.mainKana = Hiragana().getQuestions(arguments['type']);
+        this.questions = Hiragana().getQuestions(arguments['type']);
       }else{
-        this.mainKana = Katakana().getQuestions(arguments['type']);
+        this.questions = Katakana().getQuestions(arguments['type']);
       }
     generateQuestion();
     return Scaffold(
@@ -120,7 +119,6 @@ class _QuizState extends State<Quiz> {
               ],
             ),
             Text(totalPoints == null? 0.toString(): totalPoints.toString(), style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-
           ],
         ),
 

@@ -1,47 +1,195 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
-import 'katagana_button.dart';
-
-class LearnHiragana extends StatelessWidget {
+class LearnHiragana extends StatefulWidget {
   const LearnHiragana({Key key}) : super(key: key);
+
+  @override
+  _LearnHiraganaState createState() => _LearnHiraganaState();
+}
+
+class _LearnHiraganaState extends State<LearnHiragana> {
+
+  bool katakanaSelected = false, hiraganaSelected = false;
+  bool mainKanaSelected = false, dakutenKanaSelected= false, combinationKanaSelected= false;
+
+
+
+  void toggleSelect(int n){
+    setState(() {
+      if(n==1)
+        katakanaSelected = !katakanaSelected;
+      else if(n==2)
+        hiraganaSelected = !hiraganaSelected;
+      else if(n==3)
+        mainKanaSelected = !mainKanaSelected;
+      else if(n==4)
+        dakutenKanaSelected = !dakutenKanaSelected;
+      else
+        combinationKanaSelected = !combinationKanaSelected;
+    });
+  }
 
 
 
 
   @override
-  Widget build(BuildContext context) {
-
-
-    return Scaffold(
-      appBar: AppBar(
-          title:Text("Practice Katakana/Hiragana")
+  Widget katakanaButton(context){
+    return Flexible(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ButtonTheme(
+            minWidth: 200.0,
+            height: 100.0,
+            child: ElevatedButton(
+              onPressed: () => toggleSelect(1),
+              child: Image.asset("assets/fuji-mountain.png", height: 50),
+              style: ElevatedButton.styleFrom(
+                shape: CircleBorder(),
+                primary: katakanaSelected != null && katakanaSelected? Color(0xe6fcecdd): Colors.white,
+                side: BorderSide(
+                  color: Color(0xe6fea82f),
+                  style: BorderStyle.solid,
+                  width: katakanaSelected != null && katakanaSelected? 3: 1,
+                ),
+                padding: EdgeInsets.all(24),
+              ),
+            ),
+          ),
+          Padding(
+            child: Text("Katakana",style: TextStyle(color: Color(0xe6333333), fontFamily: 'OdibeeSans-Regular', fontSize:  MediaQuery.of(context).size.height * 0.03)),
+            padding:  EdgeInsets.fromLTRB(20, 20, 20, 20),
+          ),
+        ],
       ),
 
-      body: OrientationBuilder(
-        builder: (context, orientation) {
-          bool isOrientationPortrait = orientation == Orientation.portrait;
-          return Container(
-            child: Center(
-              child: isOrientationPortrait ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  KataganaButton(context, isOrientationPortrait, "katakana"),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.06),
-                  KataganaButton(context, isOrientationPortrait, "hiragana"),
-                ],
-              ) : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  KataganaButton(context,isOrientationPortrait, "katakana"),
-                  SizedBox(width: MediaQuery.of(context).size.width * 0.03),
-                  KataganaButton(context, isOrientationPortrait, "hiragana"),
-                ],
-              ),
+    );
 
+  }
+
+  Widget hiraganaButton(context){
+    return Flexible(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ButtonTheme(
+            minWidth: 200.0,
+            height: 100.0,
+            child: ElevatedButton(
+              onPressed: () => toggleSelect(2),
+              child: Image.asset("assets/fan.png", height: 50),
+              style: ElevatedButton.styleFrom(
+                shape: CircleBorder(),
+                primary: hiraganaSelected != null && hiraganaSelected? Color(0xe6fcecdd): Colors.white,
+                side: BorderSide(
+                  color: Color(0xe6fea82f),
+                  style: BorderStyle.solid,
+                  width: hiraganaSelected != null && hiraganaSelected? 3: 1,
+                ),
+                padding: EdgeInsets.all(24),
               ),
-          );}
+            ),
+          ),
+          Padding(
+            child: Text("Hiragana",style: TextStyle(color: Color(0xe6333333), fontFamily: 'OdibeeSans-Regular', fontSize:  MediaQuery.of(context).size.height * 0.03)),
+            padding:  EdgeInsets.fromLTRB(20, 20, 20, 20),
+          ),
+        ],
+      ),
+
+    );
+  }
+
+  Widget typeButton(type, jpType, context, n, active){
+    return OutlinedButton(
+      onPressed: () => toggleSelect(n),
+      style: OutlinedButton.styleFrom(
+        backgroundColor: active? Color(0xffffc288): Colors.white,
+        onSurface: Colors.red,
+        padding: EdgeInsets.all(16),
+        side:  active != null && active? BorderSide(
+          color: Color(0xfffea82f),
+          width:  3,
+        ): null,
+
+      ),
+      child: Text(type + " / " + jpType, style: TextStyle(color: active? Colors.white:Colors.black54, fontSize:  MediaQuery.of(context).size.height * 0.02)),
+    );
+
+
+  }
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+      ),
+
+      body: SingleChildScrollView(
+        child: Center(
+          child: Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  child: Text("Writing Systems",style: TextStyle(fontFamily: 'OdibeeSans-Regular', fontSize:  MediaQuery.of(context).size.height * 0.055)),
+                  padding:  EdgeInsets.fromLTRB(0, MediaQuery.of(context).size.height * 0.03, 0, MediaQuery.of(context).size.height * 0.06),
+                ),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    hiraganaButton(context),
+                    katakanaButton(context),
+                  ],
+                ),
+                Divider(),
+                Padding(
+                  child: Text("Select Kana:", style: TextStyle( color: Colors.black54,fontFamily: 'OdibeeSans-Regular', fontSize: MediaQuery.of(context).size.height * 0.03)),
+                  padding:  EdgeInsets.fromLTRB(0, MediaQuery.of(context).size.height * 0.02, 0, MediaQuery.of(context).size.height * 0.008),
+                ),
+
+
+
+                Column(
+                  children: [
+                    Padding(
+                      child: typeButton("Main Kana","メインかな", context, 3, mainKanaSelected),
+                      padding:  EdgeInsets.fromLTRB(0, MediaQuery.of(context).size.height * 0.02, 0, MediaQuery.of(context).size.height * 0.008),
+                    ),
+                    Padding(
+                      child: typeButton("Dakuten Kana", "だくてん かな",context, 4, dakutenKanaSelected),
+                      padding:  EdgeInsets.fromLTRB(0, MediaQuery.of(context).size.height * 0.02, 0, MediaQuery.of(context).size.height * 0.008),
+                    ),
+                    Padding(
+                      child: typeButton("Combination Kana", "コンビネーションかな" , context, 5, combinationKanaSelected),
+                      padding:  EdgeInsets.fromLTRB(0, MediaQuery.of(context).size.height * 0.02, 0, MediaQuery.of(context).size.height * 0.06),
+                    ),
+                    ElevatedButton(
+                      onPressed: (){},
+                      style: ElevatedButton.styleFrom(
+                        primary: Color(0xffff6701),
+                        onSurface: Colors.red,
+                        padding: EdgeInsets.all(16),
+
+                      ),
+                      child: Text("Let's Go!", style: TextStyle(fontFamily: 'NotoSans-Regular', fontSize: MediaQuery.of(context).size.height * 0.032),),
+                    )
+                  ],
+                ),
+
+                // KataganaButton(context, isOrientationPortrait, "katakana"),
+                // SizedBox(height: MediaQuery.of(context).size.height * 0.06),
+                // KataganaButton(context, isOrientationPortrait, "hiragana"),
+              ],
+            ),
+          ),
         ),
+      ),
 
 
       bottomNavigationBar:  BottomNavigationBar(
