@@ -142,6 +142,7 @@ class _LearnHiraganaState extends State<LearnHiragana> {
   }
 
   Widget typeButton(type, jpType, context, n, active){
+
     return OutlinedButton(
       onPressed: () => toggleSelect(n),
       style: OutlinedButton.styleFrom(

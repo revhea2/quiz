@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -17,13 +19,14 @@ class _QuizState extends State<Quiz> {
   String currentQuestion = "";
   List<String> choices = [];
   Random randomizer = Random();
-  int limit = 10;
   List<int> score = [];
   int totalPoints=0, counter=0;
 
 
   void generateQuestion(){
     setState(() {
+
+      counter++;
       //selects a random character
       currentQuestion = questions.keys.elementAt(randomizer.nextInt(questions.length));
       while(pastQuestions.contains(currentQuestion)){
@@ -43,8 +46,6 @@ class _QuizState extends State<Quiz> {
     });
   }
 
-
-
   void compute(){
     this.totalPoints = 0;
     for(int i = 0; i < score.length; i++){
@@ -52,75 +53,136 @@ class _QuizState extends State<Quiz> {
     }
   }
 
-
   void checkAnswer(String answer){
     setState(() {
       if(answer == questions[currentQuestion]){
         score.add(1);
         compute();
-        pastQuestions.add(currentQuestion);
       }
+      pastQuestions.add(currentQuestion);
+      generateQuestion();
     });
   }
+
+  getSize(context, percent){
+    return MediaQuery.of(context).size.height * percent;
+  }
+
+  Widget choiceButtons(context, choiceText){
+    return Padding(
+      child: OutlinedButton(
+        child: Text(choiceText, style: TextStyle(fontSize:getSize(context, 0.025))),
+        onPressed: (){
+          checkAnswer(choiceText);
+        },
+        style: OutlinedButton.styleFrom(
+          shape: StadiumBorder(),
+          padding: EdgeInsets.fromLTRB(getSize(context, 0.09),getSize(context, 0.02),getSize(context, 0.09),getSize(context, 0.02))
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(0,getSize(context, 0.01),0,0),
+    );
+
+
+  }
+
 
 
   @override
   Widget build(BuildContext context) {
-    final ButtonStyle style = ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 25));
     final arguments = ModalRoute.of(context).settings.arguments as Map;
 
-    for(String writingSystem in arguments['ws']){
-      if (writingSystem == "Hiragana"){
-        for(String kana in arguments['kana']){
-          this.questions.addAll(Hiragana().getQuestions(kana));
-        }
-      }else{
-        for(String kana in arguments['kana']){
-          this.questions.addAll(Katakana().getQuestions(kana));
+    if(questions.length == 0){
+      for(String writingSystem in arguments['ws']){
+        if (writingSystem == "Hiragana"){
+          for(String kana in arguments['kana']){
+            this.questions.addAll(Hiragana().getQuestions(kana));
+          }
+        }else{
+          for(String kana in arguments['kana']){
+            this.questions.addAll(Katakana().getQuestions(kana));
+          }
         }
       }
+      generateQuestion();
     }
 
-    generateQuestion();
+
     return Scaffold(
 
       appBar: AppBar(
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(currentQuestion, style: TextStyle(fontSize: 150, fontWeight: FontWeight.bold)),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly ,
-              children: [
-                ElevatedButton(
-                  child: Text(choices[0]),
-                  style: style,
-                  onPressed: (){
-                    checkAnswer(choices[0]);
-                  },
-                ),
-                ElevatedButton(
-                  child: Text(choices[1]),
-                  style: style,
-                  onPressed: (){
-                    checkAnswer(choices[1]);
-                  },
-                ),
-                ElevatedButton(
-                  child: Text(choices[2]),
-                  style: style,
-                  onPressed: (){
-                    checkAnswer(choices[2]);
-                  },
-                ),
-              ],
-            ),
-            Text(totalPoints == null? 0.toString(): totalPoints.toString(), style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-          ],
+        leading: IconButton(
+          color: Colors.white,
+          disabledColor: Colors.amber,
+          icon: const Icon(Icons.close),
+          iconSize: getSize(context, 0.04),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
+        title: counter < questions.length? Row(
+          children: [
+            Text("Current score:  ", style: TextStyle(color: Colors.white, fontSize: getSize(context, 0.032), fontWeight: FontWeight.bold)),
+            Text("$totalPoints", style: TextStyle(color: Colors.lightGreenAccent, fontSize: getSize(context, 0.032))),
+            Text("/", style: TextStyle(color: Colors.white70, fontSize: getSize(context, 0.032))),
+            Text("${questions.length}", style: TextStyle(color: Colors.white70, fontSize: getSize(context, 0.032)))
+          ]
+        ): null,
+      ),
+
+
+      body: SingleChildScrollView(
+        child: Center(
+          child: counter < questions.length? Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: getSize(context, 0.06)),
+              ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  primary: Color(0xffffec9e),
+                  padding: EdgeInsets.fromLTRB(getSize(context, 0.02),0,getSize(context, 0.02),0)
+                ),
+                child:  Text(currentQuestion, style: TextStyle(color: Colors.black87, fontSize: getSize(context, 0.23), fontWeight: FontWeight.bold)),
+              ),
+
+              SizedBox(height: getSize(context, 0.05)),
+
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly ,
+                children: [
+                  choiceButtons(context, choices[0]),
+                  choiceButtons(context, choices[1]),
+                  choiceButtons(context, choices[2]),
+                ],
+              ),
+            ],
+          ):
+              Column(
+                children: [
+                  Padding(
+                    child: Text("You scored $totalPoints out of ${questions.length}",style: TextStyle(fontFamily: 'OdibeeSans-Regular', fontSize:  getSize(context, 0.055))),
+                    padding:  EdgeInsets.fromLTRB(0, getSize(context, 0.07), 0, getSize(context, 0.06)),
+                  ),
+                  totalPoints < (questions.length*0.75).floor()?
+                    Padding(
+                      child: Text('You failed. But remember - the best way to get better is to practice.',style: TextStyle(fontFamily: 'Handlee-Regular', fontSize:  getSize(context, 0.03)),textAlign: TextAlign.center),
+                      padding:  EdgeInsets.fromLTRB(getSize(context, 0.07), getSize(context, 0.06), getSize(context, 0.07), getSize(context, 0.06)),
+                    ): Padding(
+                      child: Text('You passed! You did good job getting this far!',style: TextStyle(fontFamily: 'Handlee-Regular', fontSize:  getSize(context, 0.03)),textAlign: TextAlign.center),
+                      padding:  EdgeInsets.fromLTRB(getSize(context, 0.07), getSize(context, 0.06), getSize(context, 0.07), getSize(context, 0.06)),
+                    ),
+                    totalPoints < (questions.length*0.75).floor()?
+                      Image.asset("assets/gambatte.gif", height: getSize(context, 0.3))
+                        : Image.asset("assets/good-job.gif", height: getSize(context, 0.3)),
+
+
+
+
+                ],
+              )
+        ),
+
 
       ),
     );
