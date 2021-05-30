@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class LearnHiragana extends StatefulWidget {
   const LearnHiragana({Key key}) : super(key: key);
@@ -32,6 +33,44 @@ class _LearnHiraganaState extends State<LearnHiragana> {
   }
 
 
+  void proceedQuiz() {
+    List<String> ws = [];
+    List<String> kana = [];
+    if(katakanaSelected){
+      ws.add("Katakana");
+    }
+    if(hiraganaSelected){
+      ws.add("Hiragana");
+    }
+    if(mainKanaSelected){
+      kana.add("Main Kana");
+    }
+    if(dakutenKanaSelected){
+      kana.add("Dakuten Kana");
+    }
+    if(combinationKanaSelected){
+      kana.add("Combination Kana");
+    }
+
+    if(!katakanaSelected  && !hiraganaSelected){
+      Alert(
+        context: context,
+        title: "Please select a writing system!",
+      ).show();
+      return;
+    }
+
+    if(!mainKanaSelected && !dakutenKanaSelected && !combinationKanaSelected){
+      Alert(
+        context: context,
+        title: "Please select a kana!",
+      ).show();
+      return;
+    }
+
+    Navigator.pushNamed(context, '/quiz', arguments: {'ws': ws, 'kana': kana});
+
+  }
 
 
   @override
@@ -106,7 +145,7 @@ class _LearnHiraganaState extends State<LearnHiragana> {
     return OutlinedButton(
       onPressed: () => toggleSelect(n),
       style: OutlinedButton.styleFrom(
-        backgroundColor: active? Color(0xffffc288): Colors.white,
+        backgroundColor: active? Color(0xffff6701): Colors.white,
         onSurface: Colors.red,
         padding: EdgeInsets.all(16),
         side:  active != null && active? BorderSide(
@@ -117,10 +156,7 @@ class _LearnHiraganaState extends State<LearnHiragana> {
       ),
       child: Text(type + " / " + jpType, style: TextStyle(color: active? Colors.white:Colors.black54, fontSize:  MediaQuery.of(context).size.height * 0.02)),
     );
-
-
   }
-
 
 
   @override
@@ -170,10 +206,9 @@ class _LearnHiraganaState extends State<LearnHiragana> {
                       padding:  EdgeInsets.fromLTRB(0, MediaQuery.of(context).size.height * 0.02, 0, MediaQuery.of(context).size.height * 0.06),
                     ),
                     ElevatedButton(
-                      onPressed: (){},
+                      onPressed: () => proceedQuiz(),
                       style: ElevatedButton.styleFrom(
-                        primary: Color(0xffff6701),
-                        onSurface: Colors.red,
+                        primary: Colors.red,
                         padding: EdgeInsets.all(16),
 
                       ),
@@ -210,4 +245,5 @@ class _LearnHiraganaState extends State<LearnHiragana> {
       ),
     );
   }
+
 }

@@ -12,22 +12,15 @@ class Quiz extends StatefulWidget {
 }
 
 class _QuizState extends State<Quiz> {
-  Map questions;
-  List<String> pastQuestions;
-  String currentQuestion;
-  List<String> choices;
-  Random randomizer;
-  int limit;
+  Map questions = {};
+  List<String> pastQuestions = [];
+  String currentQuestion = "";
+  List<String> choices = [];
+  Random randomizer = Random();
+  int limit = 10;
   List<int> score = [];
-  int totalPoints, counter;
+  int totalPoints=0, counter=0;
 
-  _QuizState(){
-    randomizer = Random();
-    pastQuestions = [];
-    limit = 10;
-    score = [];
-    totalPoints = counter = 0;
-  }
 
   void generateQuestion(){
     setState(() {
@@ -75,16 +68,23 @@ class _QuizState extends State<Quiz> {
   Widget build(BuildContext context) {
     final ButtonStyle style = ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 25));
     final arguments = ModalRoute.of(context).settings.arguments as Map;
-      if (arguments['ws'] == "hiragana"){
-        this.questions = Hiragana().getQuestions(arguments['type']);
+
+    for(String writingSystem in arguments['ws']){
+      if (writingSystem == "Hiragana"){
+        for(String kana in arguments['kana']){
+          this.questions.addAll(Hiragana().getQuestions(kana));
+        }
       }else{
-        this.questions = Katakana().getQuestions(arguments['type']);
+        for(String kana in arguments['kana']){
+          this.questions.addAll(Katakana().getQuestions(kana));
+        }
       }
+    }
+
     generateQuestion();
     return Scaffold(
 
       appBar: AppBar(
-        title: Text(arguments['type'] + " (" + arguments['ws'] + ")"),
       ),
       body: Center(
         child: Column(
